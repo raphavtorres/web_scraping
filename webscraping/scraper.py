@@ -5,53 +5,64 @@ from time import sleep
 
 class FastShopScraper:
     def __init__(self) -> None:
-        self.url = "https://www.fastshop.com.br/web/c/4611686018425#PHONE#"
+        self.url = "https://www.polishop.com.br/smartphone?_q=smartphone&map=ft&page=#PAGE#"
         self.map = {
             "title": {
-                'xpath': "/html/body/app-root/div[1]/div[3]/app-category/div/div[4]/div[1]/div[2]/div[2]/app-product-list/div/app-product-item[#counter#]/div/a/div[3]/h3"
+                'xpath': "/html/body/div[2]/div/div[1]/div/div[2]/div/div[3]/div/div/section/div[2]/div/div/div[3]/div/div[2]/div/div[5]/div/div/div/div[2]/div[#COUNTER#]/section/a/article/div/p/strong"
             },
             "price": {
-                'xpath': "/html/body/app-root/div[1]/div[3]/app-category/div/div[4]/div[1]/div[2]/div[2]/app-product-list/div/app-product-item[#counter#]/div/a/div[3]/div[2]/app-price-v2/div/div[2]/span[1]"
+                'xpath': "/html/body/div[2]/div/div[1]/div/div[2]/div/div[3]/div/div/section/div[2]/div/div/div[3]/div/div[2]/div/div[5]/div/div/div/div[2]/div[#COUNTER#]/section/a/article/div/div[3]/p[1]/strong"
             }
         }
 
         self.driver = webdriver.Chrome()
         self.driver.maximize_window()
 
+    def get_element(self, lista):
+        counter_elem = 1
+        while True:
+            try:
+                title = self.driver.find_element(By.XPATH, self.map['title']['xpath'].replace('#COUNTER#', str(counter_elem))).text
+                print(title, end=": ")
+                price = self.driver.find_element(By.XPATH, self.map['price']['xpath'].replace('#COUNTER#', str(counter_elem))).text
+                print(price, end=" ")
+                counter_elem += 1
+                print()
+                dict = {}
+                dict['prod'] = title
+                dict['price'] = price
+                lista.append(dict)
+            except Exception as e:
+                # print("ERRO ELEMENTO", e)
+                break
+        return lista
+
     def open_site(self, phone=""):
-        self.driver.get(self.url.replace('#phone#', phone))
-        sleep(5)
-        print("========== YEAR:", phone, "==========")
-        # self.get_numbers(phone)
+        lista_e = []
+        lista = []
+        counter = 1
+        print("========== POLISHOP:", phone, "==========")
+        while counter <= 5:
+        # while True:
+            try:
+                self.driver.get(self.url.replace('#PAGE#', str(counter)))
+                sleep(5)
+                lista.append(self.get_element(lista_e))
+                counter += 1
+            except Exception as e:
+                # print("ERRO SITE", e)
+                break
+
+        lista_new = []
+        for dicionario in lista:
+            if dicionario['prod'].startswith('SMARTPHONE'):
+                lista_new.append(dicionario)
 
 
-# ((IPHONE))
-# /html/body/app-root/div[1]/div[3]/app-category/div/div[4]/div[1]/div[2]/div[2]/app-product-list/div/app-product-item[1]/div/a/div[3]/h3   
-# /html/body/app-root/div[1]/div[3]/app-category/div/div[4]/div[1]/div[2]/div[2]/app-product-list/div/app-product-item[1]/div/a/div[3]/div[2]/p ((no price))
-
-# /html/body/app-root/div[1]/div[3]/app-category/div/div[4]/div[1]/div[2]/div[2]/app-product-list/div/app-product-item[2]/div/a/div[3]/h3
-# /html/body/app-root/div[1]/div[3]/app-category/div/div[4]/div[1]/div[2]/div[2]/app-product-list/div/app-product-item[2]/div/a/div[3]/div[2]/p ((no price))
-
-# /html/body/app-root/div[1]/div[3]/app-category/div/div[4]/div[1]/div[2]/div[2]/app-product-list/div/app-product-item[3]/div/a/div[3]/h3
-# /html/body/app-root/div[1]/div[3]/app-category/div/div[4]/div[1]/div[2]/div[2]/app-product-list/div/app-product-item[3]/div/a/div[3]/div[2]/app-price-v2/div/div[2]/span[1]  ((with price))
-
-# ---------------------
-# ((MOTOROLA))
-# /html/body/app-root/div[1]/div[3]/app-category/div/div[4]/div[1]/div[2]/div[2]/app-product-list/div/app-product-item[1]/div/a/div[3]/h3
-# /html/body/app-root/div[1]/div[3]/app-category/div/div[4]/div[1]/div[2]/div[2]/app-product-list/div/app-product-item[1]/div/a/div[3]/div[2]/app-price-v2/div/div[2%]/span[1]
-# /html/body/app-root/div[1]/div[3]/app-category/div/div[4]/div[1]/div[2]/div[2]/app-product-list/div/app-product-item[1%]/div/a/div[3]/div[2]/app-price-v2/div/div[3%]/div
-
-# /html/body/app-root/div[1]/div[3]/app-category/div/div[4]/div[1]/div[2]/div[2]/app-product-list/div/app-product-item[2%]/div/a/div[3]/h3
-# /html/body/app-root/div[1]/div[3]/app-category/div/div[4]/div[1]/div[2]/div[2]/app-product-list/div/app-product-item[2%]/div/a/div[3]/div[2]/app-price-v2/div/div[1]/span[1]
+        for element in lista_new:
+            print("Celular: ", element['prod'], "Valor:", element['price'], end='\n\n')
+        
 
 
-# ---------------------
-
-# https://www.fastshop.com.br/web/c/4611686018425  -  061003/samsung_galaxy
-# https://www.fastshop.com.br/web/c/4611686018425  -  486503/iphone_
-# https://www.fastshop.com.br/web/c/4611686018425  -  153535/motorola_moto
-# https://www.fastshop.com.br/web/c/4611686018425  -  049504/zenfone_asus
-# https://www.fastshop.com.br/web/c/4611686018425  -  159013/lg_smartphone
-# https://www.fastshop.com.br/web/c/4611686018425  -  429004/xiaomi
-# https://www.fastshop.com.br/web/c/4611686018425  -  494009/grupo_infinix
-# https://www.fastshop.com.br/web/c/4611686018425  -  494008/grupo_positivo
+web_scraper = FastShopScraper()
+web_scraper.open_site()
