@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import matplotlib.pyplot as plt
     
-from scraper import WebScraper
+# from scraper import WebScraper
 
 window = tk.Tk()
 
