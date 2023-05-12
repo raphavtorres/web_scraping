@@ -4,65 +4,47 @@ from time import sleep
 
 
 class FastShopScraper:
-    def __init__(self) -> None:
-        self.url = "https://www.polishop.com.br/smartphone?_q=smartphone&map=ft&page=#PAGE#"
+    def __init__(self, subject_index) -> None:
+        self.subject_index = subject_index
+        SUBJECT = ["de-entretenimento", "biografias", "de-ficcao", "de-mitologia-e-folclore", "de-arte-e-fotografia"]
+
+        self.url = f"https://www.kabum.com.br/livros/livros-{SUBJECT[self.subject_index]}"
         self.map = {
             "title": {
-                'xpath': "/html/body/div[2]/div/div[1]/div/div[2]/div/div[3]/div/div/section/div[2]/div/div/div[3]/div/div[2]/div/div[5]/div/div/div/div[2]/div[#COUNTER#]/section/a/article/div/p/strong"
+                'xpath': '/html/body/div[1]/div[1]/div[3]/div/div/div[2]/div/main/div[#counter#]/a/div/button/div/h2/span'
             },
             "price": {
-                'xpath': "/html/body/div[2]/div/div[1]/div/div[2]/div/div[3]/div/div/section/div[2]/div/div/div[3]/div/div[2]/div/div[5]/div/div/div/div[2]/div[#COUNTER#]/section/a/article/div/div[3]/p[1]/strong"
+                'xpath': '/html/body/div[1]/div[1]/div[3]/div/div/div[2]/div/main/div[#counter#]/a/div/div/span[2]'
             }
         }
+        options = webdriver.ChromeOptions()
+        options.add_argument("--headless")
+        self.driver = webdriver.Chrome(options=options)
 
-        self.driver = webdriver.Chrome()
-        self.driver.maximize_window()
 
-    def get_element(self, lista):
-        counter_elem = 1
+    def open_site(self):
+        self.driver.get(self.url)
+        sleep(5)
+        print("========== BOOKS: ==========")
+        counter = 1
         while True:
             try:
-                title = self.driver.find_element(By.XPATH, self.map['title']['xpath'].replace('#COUNTER#', str(counter_elem))).text
+                title = self.driver.find_element(By.XPATH, self.map['title']['xpath'].replace('#counter#', str(counter))).text
                 print(title, end=": ")
-                price = self.driver.find_element(By.XPATH, self.map['price']['xpath'].replace('#COUNTER#', str(counter_elem))).text
-                print(price, end=" ")
-                counter_elem += 1
-                print()
-                dict = {}
-                dict['prod'] = title
-                dict['price'] = price
-                lista.append(dict)
-            except Exception as e:
-                # print("ERRO ELEMENTO", e)
-                break
-        return lista
-
-    def open_site(self, phone=""):
-        lista_e = []
-        lista = []
-        counter = 1
-        print("========== POLISHOP:", phone, "==========")
-        while counter <= 5:
-        # while True:
-            try:
-                self.driver.get(self.url.replace('#PAGE#', str(counter)))
-                sleep(5)
-                lista.append(self.get_element(lista_e))
+                price = self.driver.find_element(By.XPATH, self.map['price']['xpath'].replace('#counter#', str(counter))).text
+                print(price)
                 counter += 1
             except Exception as e:
-                # print("ERRO SITE", e)
+                # print("ERRO: ", e)
                 break
 
-        lista_new = []
-        for dicionario in lista:
-            if dicionario['prod'].startswith('SMARTPHONE'):
-                lista_new.append(dicionario)
 
-
-        for element in lista_new:
-            print("Celular: ", element['prod'], "Valor:", element['price'], end='\n\n')
-        
-
-
-web_scraper = FastShopScraper()
+web_scraper = FastShopScraper(4)  # maximum 4
 web_scraper.open_site()
+
+
+# https://www.kabum.com.br/livros/livros-de-entretenimento
+# https://www.kabum.com.br/livros/livros-biografias
+# https://www.kabum.com.br/livros/livros-de-ficcao
+# https://www.kabum.com.br/livros/livros-de-mitologia-e-folclore
+# https://www.kabum.com.br/livros/livros-de-arte-e-fotografia
