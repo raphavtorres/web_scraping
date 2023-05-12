@@ -8,7 +8,6 @@ window = tk.Tk()
 
 SUBJECT = ["Entretenimento", "Biografias", "Ficção", "Mitologia e Folclore", "Arte e Fotografia"]
 class Application():
-   
     def __init__(self) -> None:
         self.window = window
         self.screen()
@@ -35,13 +34,13 @@ class Application():
 
     def buttons(self):
         self.btn_search = tk.Button(self.frame_0, bg="#7a2c64", border=0, text="Search", font=("sans-serif", 12), fg="#ffffff")
-        self.btn_search.place(relx=0.77, rely=0.20, relwidth=0.1, relheight=0.7)
+        self.btn_search.place(relx=0.3, rely=0.20, relwidth=0.1, relheight=0.7)
 
         self.btn_update = tk.Button(self.frame_0, bg="#7a2c64", border=0, text="Update", font=("sans-serif", 12), fg="#ffffff")
         self.btn_update.place(relx=0.6, rely=0.20, relwidth=0.1, relheight=0.7)
 
-        self.btn_update = tk.Button(self.frame_0, bg="#7a2c64", border=0, text="Update", font=("sans-serif", 12), fg="#ffffff")
-        self.btn_update.place(relx=0.3, rely=0.20, relwidth=0.1, relheight=0.7)
+        self.btn_graph = tk.Button(self.frame_0, bg="#7a2c64", border=0, text="Graph", font=("sans-serif", 12), fg="#ffffff")
+        self.btn_graph.place(relx=0.77, rely=0.20, relwidth=0.1, relheight=0.7)
 
     def comboBox(self):
             self.cb_years = ttk.Combobox(self.frame_0, values=SUBJECT, font=("sans-serif", 12))
@@ -73,10 +72,11 @@ class Application():
     def clear(self):
         self.list_megas_tb.delete(*self.list_megas_tb.get_children())
 
-    def update(self):
-        year = self.get_year()
-        web_scraper_update = WebScraper()
-        web_scraper_update.open_site(year)
+    # def update(self):
+    #     # product_index = self.get_prod_index()
+    #     product_index = 0
+    #     web_scraper_update = WebScraper()
+    #     web_scraper_update.open_site(product_index)
 
     # def graph(self):
     #     fig, ax = plt.subplots()
