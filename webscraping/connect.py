@@ -4,7 +4,7 @@ db = mysql.connector.connect(
     host='localhost',
     user='root',
     password='',
-    database='fastshop_scraper'
+    database='web_scraping'
 )
 
 cursor = db.cursor()

@@ -1,5 +1,6 @@
 import connect as con
 
+
 def db_commit(sql, table=""):
     try:
         for command in sql:
@@ -11,9 +12,32 @@ def db_commit(sql, table=""):
 
 
 # Mudar info
-def insert_db(table, year, contest, numbers, date="00/00/0000"):
-    n1, n2, n3, n4, n5, n6 = numbers
+def insert_db(table, title, price):
     sql = [
-        f"INSERT INTO {table} (megaYear, contest, n1, n2, n3, n4, n5, n6, dateMega) VALUES ({year}, {contest}, {n1}, {n2}, {n3}, {n4}, {n5}, {n6}, '{date}')"
+        f"INSERT INTO {table} (product_name, product_price) VALUES ('{title}', '{price}')"
     ]
     db_commit(sql)
+
+
+def create_table(subject):
+    table = f"products{subject}"
+    sql = [
+        f"""
+        CREATE TABLE {table} (
+            id INT AUTO_INCREMENT,
+            product_name VARCHAR(255) NOT NULL,
+            product_price VARCHAR(255),
+            PRIMARY KEY (id)
+        );
+        """
+    ]
+    db_commit(sql, table)
+
+
+def select_products(subject):
+    table = f"products{subject}"
+    sql = f"SELECT product_name, product_price FROM {table}"
+
+    con.cursor.execute(sql)
+    result = con.cursor.fetchall()
+    return result
