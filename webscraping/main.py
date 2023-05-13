@@ -1,4 +1,4 @@
-from scraper import FastShopScraper
+from scraper import KabumScraper
 
-web_scraper = FastShopScraper()
+web_scraper = KabumScraper()
 web_scraper.open_site()

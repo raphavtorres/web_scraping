@@ -1,7 +1,9 @@
 import connect as con
+import unidecode
 
 
 def db_commit(sql, table=""):
+    table = clean_input(table)
     try:
         for command in sql:
             con.cursor.execute(command)
@@ -13,6 +15,10 @@ def db_commit(sql, table=""):
 
 # Mudar info
 def insert_db(table, title, price):
+    table = clean_input(table)
+    title = title.replace("Livro - ", "")
+    price = price.replace("R$ ", "")
+
     sql = [
         f"INSERT INTO {table} (product_name, product_price) VALUES ('{title}', '{price}')"
     ]
@@ -20,6 +26,7 @@ def insert_db(table, title, price):
 
 
 def create_table(subject):
+    subject = clean_input(subject)
     table = f"products{subject}"
     sql = [
         f"""
@@ -35,9 +42,16 @@ def create_table(subject):
 
 
 def select_products(subject):
+    subject = clean_input(subject)
     table = f"products{subject}"
     sql = f"SELECT product_name, product_price FROM {table}"
 
     con.cursor.execute(sql)
     result = con.cursor.fetchall()
     return result
+
+
+def clean_input(input):
+    input = unidecode.unidecode(input)
+    input = input.lower().replace("de-", "").replace("-", "_").replace(" ", "_")
+    return input

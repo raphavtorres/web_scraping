@@ -1,12 +1,12 @@
 import tkinter as tk
 from tkinter import ttk
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 from db_functions import select_products
+from scraper import KabumScraper
+from lists_subjects import SUBJECTS, url_subject
 
 window = tk.Tk()
-
-SUBJECT = ["Entretenimento", "Biografias", "Ficção", "Mitologia e Folclore", "Arte e Fotografia"]
 
 
 class Application():
@@ -15,8 +15,6 @@ class Application():
         self.screen()
         self.frame()
         self.buttons()
-        # self.inputs()
-        # self.labels()
         self.products_table()
         self.comboBox()
         window.mainloop()
@@ -38,15 +36,15 @@ class Application():
         self.btn_search = tk.Button(self.frame_0, bg="#7a2c64", border=0, text="Search", font=("sans-serif", 12), fg="#ffffff", command=self.read_products)
         self.btn_search.place(relx=0.3, rely=0.20, relwidth=0.1, relheight=0.7)
 
-        self.btn_update = tk.Button(self.frame_0, bg="#7a2c64", border=0, text="Update", font=("sans-serif", 12), fg="#ffffff")
+        self.btn_update = tk.Button(self.frame_0, bg="#7a2c64", border=0, text="Update", font=("sans-serif", 12), fg="#ffffff", command=self.update)
         self.btn_update.place(relx=0.6, rely=0.20, relwidth=0.1, relheight=0.7)
 
-        self.btn_graph = tk.Button(self.frame_0, bg="#7a2c64", border=0, text="Graph", font=("sans-serif", 12), fg="#ffffff")
+        self.btn_graph = tk.Button(self.frame_0, bg="#7a2c64", border=0, text="Graph", font=("sans-serif", 12), fg="#ffffff", command=self.graph)
         self.btn_graph.place(relx=0.77, rely=0.20, relwidth=0.1, relheight=0.7)
 
     def comboBox(self):
-        self.cb_products = ttk.Combobox(self.frame_0, values=SUBJECT, font=("sans-serif", 12))
-        self.cb_products.set(SUBJECT[0])
+        self.cb_products = ttk.Combobox(self.frame_0, values=SUBJECTS, font=("sans-serif", 12))
+        self.cb_products.set(SUBJECTS[0])
         self.cb_products.pack()
         self.cb_products.place(relx=0.01, rely=0.20, relwidth=0.22, relheight=0.7)
 
@@ -76,33 +74,59 @@ class Application():
 
     def read_products(self):
         self.clear()
-        # subject = self.get_subjects()
-        subject = "arte_e_fotografia"
+        subject = url_subject[self.get_subject_index()]
         products = select_products(subject)
         for product in products:
             self.list_prods_tb.insert("", "end", values=product)
 
-    def get_subjects(self):
+    def get_subject(self):
         return self.cb_products.get()
-   
-    # def update(self):
-    #     # product_index = self.get_prod_index()
-    #     product_index = 0
-    #     web_scraper_update = WebScraper()
-    #     web_scraper_update.open_site(product_index)
 
-    # def graph(self):
-    #     fig, ax = plt.subplots()
-    #     numbers = [str(num) for num in range(1, 61)]
-    #     counts = self.get_numbers()
-    #     bar_colors = 'tab:blue'
+    def get_subject_index(self):
+        subject = self.get_subject()
+        index_subject = SUBJECTS.index(subject)
+        return index_subject
 
-    #     ax.bar(numbers, counts, color=bar_colors)
+    def update(self):
+        product_index = self.get_subject_index()
+        web_scraper = KabumScraper(product_index)  # maximum 4
+        web_scraper.open_site()
 
-    #     ax.set_title(f'Graphic representation - {self.get_year()}')
-    #     ax.set_ylabel('Amount of occurrences')
+    def graph(self):
+        plt.rcParams['ytick.labelsize'] = 8
+        fig, ax = plt.subplots()
 
-    #     plt.show()
+        titles, prices = self.get_titles_and_prices()
+        bar_colors = 'tab:blue'
+
+        ax.barh(titles, prices, align='center', color=bar_colors)
+        ax.invert_yaxis()  # labels read top-to-bottom
+        ax.set_title(f'Graphic - {self.get_subject()}')
+        ax.set_xlabel('Amount of occurrences')
+
+        plt.show()
+
+    def get_titles_and_prices(self):  
+        dict_list = []
+        title_list = [""]
+        price_list = [0.0]
+        subject = url_subject[self.get_subject_index()]
+        products = select_products(subject)
+
+        for product in products:
+            dict = {}
+            dict['title'] = product[0]
+            dict['price'] = float(product[1].replace(",", "."))
+            dict_list.append(dict)
+
+        def order(dict):
+            return dict['price']
+
+        dict_list_sort = sorted(dict_list, key=order)
+        for dict in dict_list_sort:
+            title_list.append(dict['title'])
+            price_list.append(dict['price'])
+        return title_list, price_list
 
 
 windowapp = Application()

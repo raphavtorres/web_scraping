@@ -3,15 +3,16 @@ from selenium.webdriver.common.by import By
 from time import sleep
 
 from db_functions import insert_db, create_table
+from lists_subjects import SUBJECTS, url_subject
 
 
-class FastShopScraper:
+class KabumScraper:
     def __init__(self, subject_index) -> None:
         self.subject_index = subject_index
-        url_subject = ["de-entretenimento", "biografias", "de-ficcao", "de-mitologia-e-folclore", "de-arte-e-fotografia"]
-        self.subject = ["Entretenimento", "Biografias", "Ficção", "Mitologia e Folclore", "Arte e Fotografia"]
+        self.url_subject = url_subject[self.subject_index]
+        self.subject = SUBJECTS[self.subject_index]
 
-        self.url = f"https://www.kabum.com.br/livros/livros-{url_subject[self.subject_index]}"
+        self.url = f"https://www.kabum.com.br/livros/livros-{self.url_subject}"
         self.map = {
             "title": {
                 'xpath': '/html/body/div[1]/div[1]/div[3]/div/div/div[2]/div/main/div[#counter#]/a/div/button/div/h2/span'
@@ -25,7 +26,8 @@ class FastShopScraper:
         self.driver = webdriver.Chrome(options=options)
 
     def open_site(self):
-        subject = self.subject[self.subject_index].lower().replace(" ", "_")
+        subject = self.subject
+        # subject = self.subject.lower().replace(" ", "_")
         self.driver.get(self.url)
 
         create_table(subject)
@@ -36,22 +38,24 @@ class FastShopScraper:
         counter = 1
         while True:
             try:
-                title = self.driver.find_element(By.XPATH, self.map['title']['xpath'].replace('#counter#', str(counter))).text
+                title = self.driver.find_element(
+                    By.XPATH, self.map['title']['xpath'].replace('#counter#', str(counter))).text
                 print(title, end=": ")
-                price = self.driver.find_element(By.XPATH, self.map['price']['xpath'].replace('#counter#', str(counter))).text
+                price = self.driver.find_element(
+                    By.XPATH, self.map['price']['xpath'].replace('#counter#', str(counter))).text
                 print(price)
                 counter += 1
             except Exception:
                 # print("ERRO: ", e)
                 break
             insert_db(
-                table=table, 
-                title=title.replace("Livro - ", ""),
-                price=price.replace("R$ ", ""))
+                table=table,
+                title=title,
+                price=price)
 
 
-web_scraper = FastShopScraper(4)  # maximum 4
-web_scraper.open_site()
+# web_scraper = KabumScraper(4)  # maximum 4
+# web_scraper.open_site()
 
 
 # https://www.kabum.com.br/livros/livros-de-entretenimento
