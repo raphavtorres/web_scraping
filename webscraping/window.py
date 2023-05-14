@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+import awesometkinter as atk
 import matplotlib.pyplot as plt
 
 from db_functions import select_products
@@ -17,30 +18,37 @@ class Application():
         self.buttons()
         self.products_table()
         self.comboBox()
+        self.image()
         window.mainloop()
 
     def screen(self):
-        self.window.title("Fast-Shop")
+        self.window.title("KaBuM!")
+        self.img_logo = tk.PhotoImage(file="imagekabum.png")
+        self.window.iconphoto(False, self.img_logo)
+        # self.window.iconbitmap(r'./logo_kabum.ico')
         self.window.geometry('900x400')
-        self.window.configure(background='#27a15b', border=0.8)
+        self.window.configure(background='#001E66', border=0.8)
         self.window.resizable(False, False)
+        self.defaultFont = tk.font.nametofont("TkDefaultFont")
+        self.defaultFont.configure(family="sans-serif",
+                                   size=11)
 
     def frame(self):
-        self.frame_0 = tk.Frame(self.window, bg="#5effa4")
+        self.frame_0 = tk.Frame(self.window, bg="#0060B1")
         self.frame_0.place(relx=0.03, rely=0.06, relwidth=0.94, relheight=0.12)
 
-        self.frame_1 = tk.Frame(self.window, bg='#5effa4')
+        self.frame_1 = tk.Frame(self.window, bg='#0060B1')
         self.frame_1.place(relx=0.03, rely=0.22, relwidth=0.94, relheight=0.7)
 
     def buttons(self):
-        self.btn_search = tk.Button(self.frame_0, bg="#7a2c64", border=0, text="Search", font=("sans-serif", 12), fg="#ffffff", command=self.read_products)
-        self.btn_search.place(relx=0.3, rely=0.20, relwidth=0.1, relheight=0.7)
+        self.btn_search = atk.Button3d(self.frame_0, bg="#FF6500", text="SEARCH", fg="#ffffff", command=self.read_products)
+        self.btn_search.place(relx=0.3, rely=0.08, relwidth=0.1, relheight=0.9)
 
-        self.btn_update = tk.Button(self.frame_0, bg="#7a2c64", border=0, text="Update", font=("sans-serif", 12), fg="#ffffff", command=self.update)
-        self.btn_update.place(relx=0.6, rely=0.20, relwidth=0.1, relheight=0.7)
+        self.btn_update = atk.Button3d(self.frame_0, bg="#FF6500", text="UPDATE", fg="#ffffff", command=self.update)
+        self.btn_update.place(relx=0.6, rely=0.08, relwidth=0.1, relheight=0.9)
 
-        self.btn_graph = tk.Button(self.frame_0, bg="#7a2c64", border=0, text="Graph", font=("sans-serif", 12), fg="#ffffff", command=self.graph)
-        self.btn_graph.place(relx=0.77, rely=0.20, relwidth=0.1, relheight=0.7)
+        self.btn_graph = atk.Button3d(self.frame_0, bg="#FF6500", text="GRAPH", fg="#ffffff", command=self.graph)
+        self.btn_graph.place(relx=0.77, rely=0.08, relwidth=0.1, relheight=0.9)
 
     def comboBox(self):
         self.cb_products = ttk.Combobox(self.frame_0, values=SUBJECTS, font=("sans-serif", 12))
@@ -54,20 +62,25 @@ class Application():
             height=3,
             columns=(
                 'col0', 'col1', 'col3'
-                )
+                ),
             )
         self.list_prods_tb.heading('#0', text='')
         self.list_prods_tb.heading('#1', text='TITLE')
         self.list_prods_tb.heading('#2', text='PRICE')
 
         self.list_prods_tb.column('#0', width=0)
-        self.list_prods_tb.column('#1', width=250)
-        self.list_prods_tb.column('#2', width=200)
+        self.list_prods_tb.column('#1', width=400)
+        self.list_prods_tb.column('#2', width=80)
 
-        self.list_prods_tb.place(relx=0.01, rely=0.02, relwidth=0.98, relheight=0.96)
+        self.list_prods_tb.place(relx=0.01, rely=0.02, relwidth=0.6, relheight=0.96)
         self.scrool_list = ttk.Scrollbar(self.frame_1, orient='vertical')
         self.list_prods_tb.configure(yscrollcommand=self.scrool_list.set)
         self.scrool_list.place(relx=0.97, rely=0.02, relwidth=0.03, relheight=0.96)
+
+    def image(self):
+        self.img_ninja = tk.PhotoImage(file="card_kabum.png")
+        self.lb_img = tk.Label(self.frame_1, image=self.img_ninja)
+        self.lb_img.place(relx=0.62, rely=0.02, relwidth=0.34, relheight=1)
 
     def clear(self):
         self.list_prods_tb.delete(*self.list_prods_tb.get_children())
@@ -89,7 +102,7 @@ class Application():
 
     def update(self):
         product_index = self.get_subject_index()
-        web_scraper = KabumScraper(product_index)  # maximum 4
+        web_scraper = KabumScraper(product_index)
         web_scraper.open_site()
 
     def graph(self):
@@ -100,7 +113,7 @@ class Application():
         bar_colors = 'tab:blue'
 
         ax.barh(titles, prices, align='center', color=bar_colors)
-        ax.invert_yaxis()  # labels read top-to-bottom
+        ax.invert_yaxis()
         ax.set_title(f'Graphic - {self.get_subject()}')
         ax.set_xlabel('Amount of occurrences')
 

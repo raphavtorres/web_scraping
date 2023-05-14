@@ -27,7 +27,6 @@ class KabumScraper:
 
     def open_site(self):
         subject = self.subject
-        # subject = self.subject.lower().replace(" ", "_")
         self.driver.get(self.url)
 
         create_table(subject)
@@ -36,7 +35,7 @@ class KabumScraper:
         sleep(5)
         print("========== BOOKS: ==========")
         counter = 1
-        while True:
+        for i in range(10):
             try:
                 title = self.driver.find_element(
                     By.XPATH, self.map['title']['xpath'].replace('#counter#', str(counter))).text
@@ -46,20 +45,8 @@ class KabumScraper:
                 print(price)
                 counter += 1
             except Exception:
-                # print("ERRO: ", e)
                 break
             insert_db(
                 table=table,
                 title=title,
                 price=price)
-
-
-# web_scraper = KabumScraper(4)  # maximum 4
-# web_scraper.open_site()
-
-
-# https://www.kabum.com.br/livros/livros-de-entretenimento
-# https://www.kabum.com.br/livros/livros-biografias
-# https://www.kabum.com.br/livros/livros-de-ficcao
-# https://www.kabum.com.br/livros/livros-de-mitologia-e-folclore
-# https://www.kabum.com.br/livros/livros-de-arte-e-fotografia
