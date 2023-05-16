@@ -142,4 +142,4 @@ class Application():
         return title_list, price_list
 
 
-windowapp = Application()
+# windowapp = Application()

@@ -13,7 +13,6 @@ def db_commit(sql, table=""):
     con.db.commit()
 
 
-# Mudar info
 def insert_db(table, title, price):
     table = clean_input(table)
     title = title.replace("Livro - ", "")
