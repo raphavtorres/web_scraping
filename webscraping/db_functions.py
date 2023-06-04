@@ -3,13 +3,14 @@ import unidecode
 
 
 def db_commit(sql, table=""):
-    table = clean_input(table)
     try:
+        table = clean_input(table)
         for command in sql:
             con.cursor.execute(command)
     except Exception:
-        sql = f"DROP TABLE {table}"
-        con.cursor.execute(sql)
+        drop = f"DROP TABLE {table}"
+        con.cursor.execute(drop)
+        db_commit(sql, table)
     con.db.commit()
 
 
